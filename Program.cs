@@ -6,10 +6,21 @@ namespace Solver
     {
         public static void Main(string[] Args)
         {
-            var solver = new BacktrackingSolver(Input);
-            var result = solver.Solve();
             var printer = new SudokuPrinter();
-            printer.Print(result);
+            var original = Input.Clone() as char[,];
+            var solver = new BacktrackingSolver(Input)
+            {
+                Multithreaded = true,
+                SleepTimeBetweenTries = 1
+            };
+            solver.OnCharacterChanged += delegate(int X, int Y)
+            {
+                Console.Clear();
+                printer.Print(original, Input, X, Y);
+            };
+            var result = solver.Solve();
+            printer.Print(original, result);
+            Console.WriteLine(solver.Validate() ? $"Sudoku was completed succesfully!" : "Failed to correctly complete sudoku.");
         }
 
         private static readonly char[,] Input =
