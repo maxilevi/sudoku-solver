@@ -8,6 +8,8 @@ namespace Solver
         {
             var solver = new BacktrackingSolver(Input);
             var result = solver.Solve();
+            var printer = new SudokuPrinter();
+            printer.Print(result);
         }
 
         private static readonly char[,] Input =
