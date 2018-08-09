@@ -10,7 +10,6 @@ namespace Solver
             var original = Input.Clone() as char[,];
             var solver = new BacktrackingSolver(Input)
             {
-                Multithreaded = true,
                 SleepTimeBetweenTries = 1
             };
             solver.OnCharacterChanged += delegate(int X, int Y)
