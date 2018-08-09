@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 
 namespace Solver
 {
+    public delegate void OnCharacterChangedEventHandler(int X, int Y);
+    
     public class BacktrackingSolver
     {
+        public event OnCharacterChangedEventHandler OnCharacterChanged;
         private readonly char[,] _board;
+        public bool Multithreaded { get; set; }
+        public int SleepTimeBetweenTries { get; set; }
 
         public BacktrackingSolver(char[,] Board)
         {
@@ -14,7 +20,15 @@ namespace Solver
 
         public char[,] Solve()
         {
-            TrySolve();
+            if (Multithreaded)
+            {
+                var thread = new Thread(() => TrySolve());
+                thread.Start();
+            }
+            else
+            {
+                TrySolve();
+            }
             return _board;
         }
 
@@ -27,13 +41,26 @@ namespace Solver
                     if (_board[i, k] != '.') continue;
                     for (var j = 1; j < 10; j++)
                     {
+                        if (SleepTimeBetweenTries > 0)
+                        {
+                            //Thread.Sleep(SleepTimeBetweenTries);
+                        }
                         var c = char.Parse($"{j}");
-                        if (IsRowCompliant(c, k, i) && IsColumnCompliant(c, i, k))
+                        var isSquareCompliant = IsSquareCompliant(c, i, k);
+                        if (!isSquareCompliant)
+                        {
+                            bool b = IsSquareCompliant(c, i, k);
+                        }
+                        if (IsSquareCompliant(c, i, k) 
+                            && IsRowCompliant(c, k, i)
+                            && IsColumnCompliant(c, i, k))
                         {
                             _board[i, k] = c;
+                            OnCharacterChanged?.Invoke(i, k);
                             if (!TrySolve())
                             {
                                 _board[i, k] = '.';
+                                OnCharacterChanged?.Invoke(i, k);
                             }
                         }
                     }
@@ -41,6 +68,21 @@ namespace Solver
                 }
             }
 
+            return true;
+        }
+
+        public bool Validate()
+        {
+            for (var i = 0; i < 9; i++)
+            {
+                for (var k = 0; k < 9; k++)
+                {
+                    if (_board[i,k] == '.' 
+                        || !IsRowCompliant(_board[i, k], k, i)                            
+                        || !IsColumnCompliant(_board[i, k], i, k)
+                        || !IsSquareCompliant(_board[i, k], i, k)) return false;
+                }
+            }
             return true;
         }
 
@@ -54,7 +96,9 @@ namespace Solver
             {
                 for (var y = 0; y < 3; y++)
                 {
-                    if (_board[offsetX + x, offsetY + y] == N) return false;
+                    var newX = offsetX + x;
+                    var newY = offsetY + y;
+                    if (_board[newX, newY] == N && newX != X && newY != Y) return false;
                 }
             }
 
