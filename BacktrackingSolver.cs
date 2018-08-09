@@ -1,4 +1,7 @@
-﻿namespace Solver
+﻿using System;
+using System.Linq;
+
+namespace Solver
 {
     public class BacktrackingSolver
     {
@@ -21,38 +24,31 @@
             {
                 for (var k = 0; k < 9; k++)
                 {
-                    if (_board[i, k] == '.')
+                    if (_board[i, k] != '.') continue;
+                    for (var j = 1; j < 10; j++)
                     {
-                        var missingChar = FindMissing(i, k);
-                        if (missingChar == default(char)) return false;
-                        _board[i, k] = missingChar;
-                        if (TrySolve()) continue;
-                        _board[i, k] = missingChar;
-                        return false;
+                        var c = char.Parse($"{j}");
+                        if (IsRowCompliant(c, k, i) && IsColumnCompliant(c, i, k))
+                        {
+                            _board[i, k] = c;
+                            if (!TrySolve())
+                            {
+                                _board[i, k] = '.';
+                            }
+                        }
                     }
+                    if (_board[i, k] == '.') return false;
                 }
             }
 
             return true;
         }
 
-        private char FindMissing(int X, int Y)
-        {
-            var chars = new[] {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
-            for (var k = 0; k < chars.Length; k++)
-            {
-                var c = chars[k];
-                if (IsSquareCompliant(c, X, Y)
-                    && IsRowCompliant(c, Y)
-                    && IsColumnCompliant(c, X)) return c;
-            }
-            return default(char);
-        }
 
         private bool IsSquareCompliant(char N, int X, int Y)
         {
-            var offsetX = X % 3;
-            var offsetY = Y % 3;
+            var offsetX = (int)(X / 3);
+            var offsetY = (int)(Y / 3);
 
             for (var x = 0; x < 3; x++)
             {
@@ -65,21 +61,21 @@
             return true;
         }
 
-        private bool IsRowCompliant(char N, int Y)
+        private bool IsRowCompliant(char N, int Y, int X)
         {
             for (var i = 0; i < 9; i++)
             {
-                if (_board[i, Y] == N) return false;
+                if (_board[i, Y] == N && i != X) return false;
             }
 
             return true;
         }
 
-        private bool IsColumnCompliant(char N, int X)
+        private bool IsColumnCompliant(char N, int X, int Y)
         {
             for (var i = 0; i < 9; i++)
             {
-                if (_board[X, i] == N) return false;
+                if (_board[X, i] == N && i != Y) return false;
             }
 
             return true;
