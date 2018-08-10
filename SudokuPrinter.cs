@@ -6,6 +6,8 @@ namespace Solver
     {
         public void Print(char [,] OriginalInput, char [,] Input, int HighlightX = -1, int HighlightY = -1)
         {
+            Console.CursorVisible = false;
+            Console.SetCursorPosition(0, 0);
             for (var i = 0; i < Input.GetLength(0); i++)
             {
                 for (var k = 0; k < Input.GetLength(1); k++)
