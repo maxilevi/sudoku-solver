@@ -10,7 +10,6 @@ namespace Solver
     {
         public event OnCharacterChangedEventHandler OnCharacterChanged;
         private readonly char[,] _board;
-        public int SleepTimeBetweenTries { get; set; }
 
         public BacktrackingSolver(char[,] Board)
         {
