@@ -8,17 +8,13 @@ namespace Solver
         {
             var printer = new SudokuPrinter();
             var original = Input.Clone() as char[,];
-            var solver = new BacktrackingSolver(Input)
-            {
-                SleepTimeBetweenTries = 1
-            };
+            var solver = new BacktrackingSolver(Input);
+            printer.Print(original, Input);
             solver.OnCharacterChanged += delegate(int X, int Y)
             {
-                Console.Clear();
                 printer.Print(original, Input, X, Y);
             };
             var result = solver.Solve();
-            printer.Print(original, result);
             Console.WriteLine(solver.Validate() ? $"Sudoku was completed succesfully!" : "Failed to correctly complete sudoku.");
         }
 
