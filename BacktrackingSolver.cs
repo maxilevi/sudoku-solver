@@ -29,6 +29,7 @@ namespace Solver
                 for (var k = 0; k < 9; k++)
                 {
                     if (_board[i, k] != '.') continue;
+                    OnCharacterChanged?.Invoke(i,k);
                     for (var j = 1; j < 10; j++)
                     {
                         var c = char.Parse($"{j}");
